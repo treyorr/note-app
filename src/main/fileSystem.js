@@ -1,4 +1,4 @@
-const { app, ipcMain } = require('electron')
+const { app, ipcMain, BrowserWindow } = require('electron')
 const userDataPath = app.getPath('userData')
 const fs = require('fs')
 const path = require('path')
@@ -24,5 +24,25 @@ ipcMain.handle('getNoteFileNames', async () => {
   } catch (error) {
     console.error('Error reading note file names:', error)
     return []
+  }
+})
+
+ipcMain.handle('createCollection', async (event, collection) => {
+  try {
+    console.log(collection)
+    const notesDirectory = getNoteDir()
+    const newDirPath = path.join(notesDirectory, collection.name)
+
+    if (fs.existsSync(newDirPath)) {
+      throw new Error(`Directory "${collection.name}" already exists.`)
+    }
+
+    fs.mkdirSync(newDirPath)
+    console.log(`Directory "${collection.name}" created.`)
+    BrowserWindow.getFocusedWindow().webContents.send('new-collection')
+    return { success: true }
+  } catch (error) {
+    console.error(`Error creating directory: ${error.message}`)
+    return { success: false, error: error.message }
   }
 })
