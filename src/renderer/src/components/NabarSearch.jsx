@@ -1,23 +1,8 @@
-import {
-  TextInput,
-  Code,
-  UnstyledButton,
-  Badge,
-  Text,
-  Group,
-  ActionIcon,
-  Tooltip,
-  rem
-} from '@mantine/core'
-import { IconBulb, IconUser, IconCheckbox, IconSearch, IconPlus } from '@tabler/icons-react'
+import { TextInput, Code, Text, Group, ActionIcon, Tooltip, rem } from '@mantine/core'
+import { IconSearch, IconPlus } from '@tabler/icons-react'
 import { UserButton } from './UserButton/UserButton'
 import classes from './NavbarSearch.module.css'
-
-const links = [
-  { icon: IconBulb, label: 'Activity', notifications: 3 },
-  { icon: IconCheckbox, label: 'Tasks', notifications: 4 },
-  { icon: IconUser, label: 'Contacts' }
-]
+import React, { useEffect, useState } from 'react'
 
 const collections = [
   { emoji: '👍', label: 'Sales' },
@@ -32,19 +17,21 @@ const collections = [
 ]
 
 export function NavbarSearch() {
-  const mainLinks = links.map((link) => (
-    <UnstyledButton key={link.label} className={classes.mainLink}>
-      <div className={classes.mainLinkInner}>
-        <link.icon size={20} className={classes.mainLinkIcon} stroke={1.5} />
-        <span>{link.label}</span>
-      </div>
-      {link.notifications && (
-        <Badge size="sm" variant="filled" className={classes.mainLinkBadge}>
-          {link.notifications}
-        </Badge>
-      )}
-    </UnstyledButton>
-  ))
+  const [noteFileNames, setNoteFileNames] = useState([])
+
+  useEffect(() => {
+    const fetchNoteFileNames = async () => {
+      try {
+        const fileNames = await window.electron.ipcRenderer.invoke('getNoteFileNames')
+        console.log(fileNames)
+        setNoteFileNames(fileNames)
+      } catch (error) {
+        console.error('Error fetching note file names:', error)
+      }
+    }
+
+    fetchNoteFileNames()
+  }, []) // Run once on component mount
 
   const collectionLinks = collections.map((collection) => (
     <a
@@ -73,10 +60,6 @@ export function NavbarSearch() {
         styles={{ section: { pointerEvents: 'none' } }}
         mb="sm"
       />
-
-      <div className={classes.section}>
-        <div className={classes.mainLinks}>{mainLinks}</div>
-      </div>
 
       <div className={classes.section}>
         <Group className={classes.collectionsHeader} justify="space-between">
