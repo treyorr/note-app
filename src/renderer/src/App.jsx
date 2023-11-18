@@ -1,6 +1,6 @@
 import { AppShell } from '@mantine/core'
 
-import { NavbarSearch } from './components/NabarSearch'
+import { NavbarSearch } from './components/NavBar/NabarSearch'
 
 function App() {
   return (

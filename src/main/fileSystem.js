@@ -15,26 +15,25 @@ export function setUpFileSystem() {
   }
 }
 
-ipcMain.handle('getNoteFileNames', async () => {
+ipcMain.handle('get-collections', async () => {
   const notesDirectory = getNoteDir()
 
   try {
-    const fileNames = await fs.promises.readdir(notesDirectory)
-    return fileNames
+    const response = await fs.promises.readdir(notesDirectory, { withFileTypes: true })
+    return response.filter((dirent) => dirent.isDirectory()).map((dirent) => dirent.name)
   } catch (error) {
-    console.error('Error reading note file names:', error)
+    console.error('Error reading collection names:', error)
     return []
   }
 })
 
 ipcMain.handle('createCollection', async (event, collection) => {
   try {
-    console.log(collection)
     const notesDirectory = getNoteDir()
     const newDirPath = path.join(notesDirectory, collection.name)
 
     if (fs.existsSync(newDirPath)) {
-      throw new Error(`Directory "${collection.name}" already exists.`)
+      throw new Error(`Collection "${collection.name}" already exists.`)
     }
 
     fs.mkdirSync(newDirPath)

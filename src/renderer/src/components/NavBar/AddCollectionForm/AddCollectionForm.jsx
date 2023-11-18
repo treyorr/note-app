@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { TextInput, Group, Button } from '@mantine/core'
 import { useForm } from '@mantine/form'
 
-export function AddCollectionForm({ collections }) {
+export function AddCollectionForm({ collections, close }) {
   const form = useForm({
     validateInputOnChange: true,
     initialValues: {
@@ -22,16 +22,23 @@ export function AddCollectionForm({ collections }) {
   async function createCollection(values) {
     try {
       const response = await window.electron.ipcRenderer.invoke('createCollection', values)
+      if (response.success) {
+        close()
+      } else {
+        throw response.error
+      }
     } catch (error) {
-      console.error('Error fetching note file names:', error)
+      form.setErrors({ name: error })
     }
   }
 
   return (
     <form onSubmit={form.onSubmit((values) => createCollection(values))}>
-      <TextInput label="Name" placeholder="Organic Chemistry" {...form.getInputProps('name')} />
+      <TextInput label="Name" data-autoFocus placeholder="School" {...form.getInputProps('name')} />
       <Group justify="flex-end" mt="md">
-        <Button type="submit">Create</Button>
+        <Button disabled={form.getTransformedValues().name.length == 0} color="teal" type="submit">
+          Create
+        </Button>
       </Group>
     </form>
   )

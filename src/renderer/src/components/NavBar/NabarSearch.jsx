@@ -18,25 +18,30 @@ import { AddCollectionForm } from './AddCollectionForm/AddCollectionForm'
 
 export function NavbarSearch() {
   const [opened, { open, close }] = useDisclosure(false)
-  const [noteFileNames, setNoteFileNames] = useState([])
+  const [collections, setCollections] = useState([])
 
-  const fetchNoteFileNames = async () => {
+  const fetchCollections = async () => {
     try {
-      const fileNames = await window.electron.ipcRenderer.invoke('getNoteFileNames')
-      console.log(fileNames)
-      setNoteFileNames(fileNames)
+      const collections = await window.electron.ipcRenderer.invoke('get-collections')
+      setCollections(collections)
     } catch (error) {
-      console.error('Error fetching note file names:', error)
+      console.error('Error fetching collections:', error)
     }
   }
 
   useEffect(() => {
-    fetchNoteFileNames()
+    fetchCollections()
+
+    window.electron.ipcRenderer.removeAllListeners('new-collection')
+
+    window.electron.ipcRenderer.on('new-collection', () => fetchCollections())
+
+    return () => {
+      window.electron.ipcRenderer.removeAllListeners('new-collection')
+    }
   }, []) // Run once on component mount
 
-  window.electron.ipcRenderer.on('new-collection', () => fetchNoteFileNames())
-
-  const collectionLinks = noteFileNames.map((collection) => (
+  const collectionLinks = collections.map((collection) => (
     <Button
       fullWidth
       justify="left"
@@ -53,7 +58,7 @@ export function NavbarSearch() {
   return (
     <>
       <Drawer opened={opened} size="xs" onClose={close} title="Create A New Collection">
-        <AddCollectionForm collections={noteFileNames} />
+        <AddCollectionForm collections={collections} close={close} />
       </Drawer>
       <nav className={classes.navbar}>
         <div className={classes.section}>
