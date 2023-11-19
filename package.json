@@ -23,7 +23,9 @@
     "@mantine/form": "^7.2.2",
     "@mantine/hooks": "^7.2.2",
     "@tabler/icons-react": "^2.40.0",
-    "electron-updater": "^6.1.1"
+    "clsx": "^2.0.0",
+    "electron-updater": "^6.1.1",
+    "mantine-contextmenu": "^7.1.12"
   },
   "devDependencies": {
     "@electron-toolkit/eslint-config": "^1.0.1",

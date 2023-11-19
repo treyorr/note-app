@@ -15,6 +15,7 @@ import { UserButton } from './UserButton/UserButton'
 import classes from './NavbarSearch.module.css'
 import React, { useEffect, useState } from 'react'
 import { AddCollectionForm } from './AddCollectionForm/AddCollectionForm'
+import { Collection } from './Collection/Collection'
 
 export function NavbarSearch() {
   const [opened, { open, close }] = useDisclosure(false)
@@ -40,20 +41,6 @@ export function NavbarSearch() {
       window.electron.ipcRenderer.removeAllListeners('new-collection')
     }
   }, []) // Run once on component mount
-
-  const collectionLinks = collections.map((collection) => (
-    <Button
-      fullWidth
-      justify="left"
-      variant="transparent"
-      size="compact-md"
-      onClick={(event) => event.preventDefault()}
-      key={collection.label}
-      className={classes.collectionButton}
-    >
-      {collection}
-    </Button>
-  ))
 
   return (
     <>
@@ -86,7 +73,11 @@ export function NavbarSearch() {
               </ActionIcon>
             </Tooltip>
           </Group>
-          <div className={classes.collections}>{collectionLinks}</div>
+          <div className={classes.collections}>
+            {collections.map((collection) => (
+              <Collection key={collection.label} collection={collection} />
+            ))}
+          </div>
         </div>
       </nav>
     </>

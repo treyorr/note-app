@@ -1,8 +1,6 @@
-/* eslint-disable react/prop-types */
-import { TextInput, Group, Button } from '@mantine/core'
 import { useForm } from '@mantine/form'
-
-export function AddCollectionForm({ collections, close }) {
+import { Group, Button, TextInput } from '@mantine/core'
+export function AddNewNoteForm({ directory = [] }) {
   const form = useForm({
     validateInputOnChange: true,
     initialValues: {
@@ -12,7 +10,7 @@ export function AddCollectionForm({ collections, close }) {
       name: (name) =>
         name.length > 20
           ? 'Name must be 20 characters or less'
-          : collections.includes(name)
+          : directory.includes(name)
             ? 'Collection already exists'
             : null
     }
@@ -33,7 +31,12 @@ export function AddCollectionForm({ collections, close }) {
 
   return (
     <form onSubmit={form.onSubmit((values) => createCollection(values))}>
-      <TextInput label="Name" data-autofocus placeholder="School" {...form.getInputProps('name')} />
+      <TextInput
+        label="Name"
+        data-autofocus
+        placeholder="Quantum Tunneling"
+        {...form.getInputProps('name')}
+      />
       <Group justify="flex-end" mt="md">
         <Button disabled={form.getTransformedValues().name.length == 0} color="teal" type="submit">
           Create

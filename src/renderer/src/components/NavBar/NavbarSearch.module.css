@@ -77,18 +77,3 @@
   padding-right: var(--mantine-spacing-md);
   margin-bottom: rem(5px);
 }
-
-.collectionButton {
-  padding: rem(8px) var(--mantine-spacing-xs);
-  text-decoration: none;
-  border-radius: var(--mantine-radius-sm);
-  font-size: var(--mantine-font-size-xs);
-  color: var(--mantine-color-dark-0);
-  line-height: 1;
-  font-weight: 500;
-
-  &:hover {
-    background-color: var(--mantine-color-dark-6);
-    color: var(--mantine-color-dark-0);
-  }
-}

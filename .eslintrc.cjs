@@ -7,6 +7,7 @@ module.exports = {
     '@electron-toolkit/eslint-config-prettier'
   ],
   rules: {
-    'no-unused-vars': 'off'
+    'no-unused-vars': 'off',
+    'react/prop-types': 'off'
   }
 }
