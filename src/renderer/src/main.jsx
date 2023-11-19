@@ -11,7 +11,7 @@ import 'mantine-contextmenu/styles.layer.css'
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <MantineProvider defaultColorScheme="dark">
-      <ContextMenuProvider shadow="md" >
+      <ContextMenuProvider shadow="md">
         <App />
       </ContextMenuProvider>
     </MantineProvider>

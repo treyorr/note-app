@@ -1,24 +1,23 @@
 import { useForm } from '@mantine/form'
 import { Group, Button, TextInput } from '@mantine/core'
-export function AddNewNoteForm({ directory = [] }) {
+export function AddNewNoteForm({ path, close }) {
   const form = useForm({
     validateInputOnChange: true,
     initialValues: {
       name: ''
     },
     validate: {
-      name: (name) =>
-        name.length > 20
-          ? 'Name must be 20 characters or less'
-          : directory.includes(name)
-            ? 'Collection already exists'
-            : null
+      name: (name) => (name.length > 20 ? 'Name must be 20 characters or less' : null)
     }
   })
 
-  async function createCollection(values) {
+  async function createNote(values) {
+    let args = {
+      fpath: path,
+      fname: values.name
+    }
     try {
-      const response = await window.electron.ipcRenderer.invoke('createCollection', values)
+      const response = await window.electron.ipcRenderer.invoke('create-note', args)
       if (response.success) {
         close()
       } else {
@@ -30,7 +29,7 @@ export function AddNewNoteForm({ directory = [] }) {
   }
 
   return (
-    <form onSubmit={form.onSubmit((values) => createCollection(values))}>
+    <form onSubmit={form.onSubmit((values) => createNote(values))}>
       <TextInput
         label="Name"
         data-autofocus

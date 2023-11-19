@@ -45,3 +45,33 @@ ipcMain.handle('createCollection', async (event, collection) => {
     return { success: false, error: error.message }
   }
 })
+
+ipcMain.handle('create-note', async (event, ...args) => {
+  try {
+    const { fpath, fname } = args[0]
+    const notePath = path.join(getNoteDir(), fpath, fname + '.json')
+    fs.writeFileSync(notePath, '', { flag: 'ax' })
+    console.log(`Note "${fname}" created.`)
+    return { success: true }
+  } catch (error) {
+    console.error(`Error creating note: ${error.message}`)
+    if (error.code === 'EEXIST') {
+      return { success: false, error: 'A note with the same name already exists.' }
+    }
+
+    return { success: false, error: error.message }
+  }
+})
+
+ipcMain.handle('get-dir-contents', async (event, ...args) => {
+  try {
+    const { dpath } = args[0]
+    console.log(dpath)
+    const dirPath = path.join(getNoteDir(), dpath)
+    const response = await fs.readdirSync(dirPath, { withFileTypes: true })
+    return response.map((dirent) => dirent.name)
+  } catch (error) {
+    console.error(`Error reading directory: ${error.message}`)
+    return { success: false, error: error.message }
+  }
+})

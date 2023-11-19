@@ -10,15 +10,25 @@ export function Collection({ collection }) {
   const [opened, { open, close }] = useDisclosure(false)
   const { showContextMenu } = useContextMenu()
   const [isOpen, setIsOpen] = useState(false)
+  const [dirContents, setDirContents] = useState([])
 
-  function handleClick() {
+  async function handleClick() {
+    //get the contents of dir if they dont exist
+    if (!isOpen && dirContents.length == 0) {
+      console.log(collection)
+      let args = {
+        dPath: collection
+      }
+      const response = await window.electron.ipcRenderer.invoke('get-dir-contents', args)
+      console.log(response)
+    }
     setIsOpen(!isOpen)
   }
 
   return (
     <>
       <Modal opened={opened} onClose={close} title="New Note">
-        <AddNewNoteForm />
+        <AddNewNoteForm path={collection} close={close} />
       </Modal>
       <Button
         fullWidth
