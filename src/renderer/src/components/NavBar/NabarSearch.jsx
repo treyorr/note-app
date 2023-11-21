@@ -15,7 +15,7 @@ import { UserButton } from './UserButton/UserButton'
 import classes from './NavbarSearch.module.css'
 import React, { useEffect, useState } from 'react'
 import { AddCollectionForm } from './AddCollectionForm/AddCollectionForm'
-import { Collection } from './Collection/Collection'
+import { Entity } from './Entity/Entity'
 
 export function NavbarSearch() {
   const [opened, { open, close }] = useDisclosure(false)
@@ -24,6 +24,7 @@ export function NavbarSearch() {
   const fetchCollections = async () => {
     try {
       const collections = await window.electron.ipcRenderer.invoke('get-collections')
+      console.log(collections)
       setCollections(collections)
     } catch (error) {
       console.error('Error fetching collections:', error)
@@ -75,7 +76,7 @@ export function NavbarSearch() {
           </Group>
           <div className={classes.collections}>
             {collections.map((collection) => (
-              <Collection key={collection.label} collection={collection} />
+              <Entity key={collection.name} path={[]} self={collection} />
             ))}
           </div>
         </div>

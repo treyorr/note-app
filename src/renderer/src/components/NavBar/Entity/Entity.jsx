@@ -6,7 +6,7 @@ import { useContextMenu } from 'mantine-contextmenu'
 import { IconFile, IconFolder } from '@tabler/icons-react'
 import { AddNewNoteForm } from '../Note/AddNewNote'
 
-export function Collection({ collection }) {
+export function Entity({ path = [], self: entitySelf = null }) {
   const [opened, { open, close }] = useDisclosure(false)
   const { showContextMenu } = useContextMenu()
   const [isOpen, setIsOpen] = useState(false)
@@ -14,30 +14,35 @@ export function Collection({ collection }) {
 
   async function handleClick() {
     //get the contents of dir if they dont exist
+    //if we have a file
+    if (entitySelf.type == 'file') {
+      setIsOpen(!isOpen)
+      return
+    }
+    //if we have a directory
     if (!isOpen && dirContents.length == 0) {
-      console.log(collection)
       let args = {
-        dPath: collection
+        dPath: [...path, entitySelf.name]
       }
       const response = await window.electron.ipcRenderer.invoke('get-dir-contents', args)
-      console.log(response)
+      setDirContents(response)
     }
     setIsOpen(!isOpen)
   }
-
   return (
     <>
       <Modal opened={opened} onClose={close} title="New Note">
-        <AddNewNoteForm path={collection} close={close} />
+        <AddNewNoteForm path={[...path, entitySelf.name]} close={close} />
       </Modal>
       <Button
         fullWidth
         justify="left"
-        variant="transparent"
+        variant={isOpen ? 'light' : 'transparent'}
         size="compact-md"
-        key={collection.label}
+        key={path.label}
         className={classes.collectionButton}
         onClick={handleClick}
+        color={entitySelf.type == 'directory' ? 'gray' : 'indigo'}
         onContextMenu={showContextMenu(
           [
             {
@@ -60,9 +65,16 @@ export function Collection({ collection }) {
           }
         )}
       >
-        {collection}
+        {entitySelf.name}
       </Button>
-      {isOpen && <div>trey</div>}
+      {isOpen &&
+        dirContents.map((dirContent, i) => {
+          return (
+            <div key={i} style={{ marginLeft: '10px' }}>
+              <Entity path={[...path, entitySelf.name]} self={dirContent} />
+            </div>
+          )
+        })}
     </>
   )
 }
