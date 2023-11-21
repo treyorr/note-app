@@ -1,7 +1,7 @@
 .collectionButton {
   padding: rem(1px) var(--mantine-spacing-xs);
   text-decoration: none;
-  border-radius: var(--mantine-radius-sm);
+  border-radius: rem(0px);
   font-size: var(--mantine-font-size-xs);
   color: var(--mantine-color-dark-0);
   line-height: 1;

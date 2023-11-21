@@ -1,8 +1,10 @@
 import { AppShell } from '@mantine/core'
 
 import { NavbarSearch } from './components/NavBar/NabarSearch'
+import { useFileContext } from './FileContext'
 
 function App() {
+  const { currentOpenFile, setFile } = useFileContext()
   return (
     <AppShell header={{ height: 60 }} navbar={{ width: 300, breakpoint: 'sm' }} padding="lg">
       <AppShell.Header>
@@ -13,7 +15,7 @@ function App() {
         <NavbarSearch />
       </AppShell.Navbar>
 
-      <AppShell.Main>Main</AppShell.Main>
+      <AppShell.Main>{JSON.stringify(currentOpenFile)}</AppShell.Main>
     </AppShell>
   )
 }

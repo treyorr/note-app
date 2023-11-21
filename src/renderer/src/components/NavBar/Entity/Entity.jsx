@@ -5,17 +5,31 @@ import { useState } from 'react'
 import { useContextMenu } from 'mantine-contextmenu'
 import { IconFile, IconFolder } from '@tabler/icons-react'
 import { AddNewNoteForm } from '../Note/AddNewNote'
+import { useFileContext } from '../../../FileContext'
 
 export function Entity({ path = [], self: entitySelf = null }) {
   const [opened, { open, close }] = useDisclosure(false)
   const { showContextMenu } = useContextMenu()
   const [isOpen, setIsOpen] = useState(false)
   const [dirContents, setDirContents] = useState([])
+  const { currentOpenFile, setFile } = useFileContext()
+
+  function isThisCurrentOpenFile() {
+    const combinedSelfString = [...path, entitySelf.name].join('')
+    const combinedOpenString = currentOpenFile.join('')
+
+    return combinedSelfString == combinedOpenString
+  }
 
   async function handleClick() {
     //get the contents of dir if they dont exist
     //if we have a file
     if (entitySelf.type == 'file') {
+      if (isThisCurrentOpenFile()) {
+        setFile([])
+      } else {
+        setFile([...path, entitySelf.name])
+      }
       setIsOpen(!isOpen)
       return
     }
@@ -29,6 +43,7 @@ export function Entity({ path = [], self: entitySelf = null }) {
     }
     setIsOpen(!isOpen)
   }
+
   return (
     <>
       <Modal opened={opened} onClose={close} title="New Note">
@@ -37,12 +52,16 @@ export function Entity({ path = [], self: entitySelf = null }) {
       <Button
         fullWidth
         justify="left"
-        variant={isOpen ? 'light' : 'transparent'}
+        variant={
+          (entitySelf.type == 'directory' && isOpen) || isThisCurrentOpenFile()
+            ? 'light'
+            : 'transparent'
+        }
         size="compact-md"
         key={path.label}
         className={classes.collectionButton}
         onClick={handleClick}
-        color={entitySelf.type == 'directory' ? 'gray' : 'indigo'}
+        color={entitySelf.type == 'directory' ? 'gray' : isThisCurrentOpenFile() ? 'cyan' : ''}
         onContextMenu={showContextMenu(
           [
             {
@@ -70,7 +89,7 @@ export function Entity({ path = [], self: entitySelf = null }) {
       {isOpen &&
         dirContents.map((dirContent, i) => {
           return (
-            <div key={i} style={{ marginLeft: '10px' }}>
+            <div key={i} style={{ borderLeft: '1px solid white', marginLeft: '10px' }}>
               <Entity path={[...path, entitySelf.name]} self={dirContent} />
             </div>
           )
