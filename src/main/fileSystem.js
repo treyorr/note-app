@@ -85,6 +85,28 @@ ipcMain.handle('create-note', async (event, ...args) => {
   }
 })
 
+ipcMain.handle('create-section', async (event, ...args) => {
+  try {
+    const { spath, sname } = args[0]
+    const sectionPath = path.join(getNoteDir(), ...spath, sname)
+    try {
+      await fs.access(sectionPath)
+      throw new Error(`Section "${sname}" already exists.`)
+    } catch (error) {
+      if (error.code !== 'ENOENT') {
+        throw error
+      }
+    }
+
+    await fs.mkdir(sectionPath)
+    console.log(`Section "${sname}" created.`)
+    return { success: true }
+  } catch (error) {
+    console.error(`Error creating directory: ${error.message}`)
+    return { success: false, error: error.message }
+  }
+})
+
 ipcMain.handle('get-dir-contents', async (event, ...args) => {
   try {
     const { dPath } = args[0]

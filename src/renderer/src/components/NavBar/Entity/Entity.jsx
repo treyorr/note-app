@@ -6,9 +6,11 @@ import { useContextMenu } from 'mantine-contextmenu'
 import { IconFile, IconFolder } from '@tabler/icons-react'
 import { AddNewNoteForm } from '../Note/AddNewNote'
 import { useFileContext } from '../../../FileContext'
+import { AddNewSectionForm } from '../Section/AddNewSection'
 
 export function Entity({ path = [], self: entitySelf = null }) {
-  const [opened, { open, close }] = useDisclosure(false)
+  const [addNoteOpened, addNoteHandlers] = useDisclosure(false)
+  const [addSectionOpened, addSectionHandlers] = useDisclosure(false)
   const { showContextMenu } = useContextMenu()
   const [isOpen, setIsOpen] = useState(false)
   const [dirContents, setDirContents] = useState([])
@@ -19,6 +21,15 @@ export function Entity({ path = [], self: entitySelf = null }) {
     const combinedOpenString = currentOpenFile.join('')
 
     return combinedSelfString == combinedOpenString
+  }
+  async function updateContents() {
+    if (isOpen) {
+      let args = {
+        dPath: [...path, entitySelf.name]
+      }
+      const response = await window.electron.ipcRenderer.invoke('get-dir-contents', args)
+      setDirContents(response)
+    }
   }
 
   async function handleClick() {
@@ -34,7 +45,7 @@ export function Entity({ path = [], self: entitySelf = null }) {
       return
     }
     //if we have a directory
-    if (!isOpen && dirContents.length == 0) {
+    if (!isOpen) {
       let args = {
         dPath: [...path, entitySelf.name]
       }
@@ -46,8 +57,19 @@ export function Entity({ path = [], self: entitySelf = null }) {
 
   return (
     <>
-      <Modal opened={opened} onClose={close} title="New Note">
-        <AddNewNoteForm path={[...path, entitySelf.name]} close={close} />
+      <Modal opened={addNoteOpened} onClose={addNoteHandlers.close} title="New Note">
+        <AddNewNoteForm
+          path={[...path, entitySelf.name]}
+          close={addNoteHandlers.close}
+          updateContents={updateContents}
+        />
+      </Modal>
+      <Modal opened={addSectionOpened} onClose={addSectionHandlers.close} title="New Section">
+        <AddNewSectionForm
+          path={[...path, entitySelf.name]}
+          close={addSectionHandlers.close}
+          updateContents={updateContents}
+        />
       </Modal>
       <Button
         fullWidth
@@ -67,14 +89,16 @@ export function Entity({ path = [], self: entitySelf = null }) {
             {
               key: 'newfile',
               title: 'New Note',
+              hidden: entitySelf.type == 'file',
               icon: <IconFile size={20} />,
-              onClick: () => open()
+              onClick: () => addNoteHandlers.open()
             },
             {
-              key: 'newfolder',
-              title: 'New Folder',
+              key: 'newsection',
+              title: 'New Section',
+              hidden: entitySelf.type == 'file',
               icon: <IconFolder size={20} />,
-              onClick: () => console.log('download')
+              onClick: () => addSectionHandlers.open()
             }
           ],
           {
