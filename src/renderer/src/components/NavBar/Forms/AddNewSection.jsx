@@ -1,5 +1,7 @@
 import { useForm } from '@mantine/form'
 import { Group, Button, TextInput } from '@mantine/core'
+import Picker from '@emoji-mart/react'
+import data from '@emoji-mart/data'
 export function AddNewSectionForm({ path, close, updateContents, openOnAdd }) {
   const form = useForm({
     validateInputOnChange: true,
@@ -37,6 +39,7 @@ export function AddNewSectionForm({ path, close, updateContents, openOnAdd }) {
         placeholder="General Relativity"
         {...form.getInputProps('name')}
       />
+      <Picker data={data} />
       <Group justify="flex-end" mt="md">
         <Button disabled={form.getTransformedValues().name.length == 0} color="teal" type="submit">
           Create

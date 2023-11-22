@@ -2,10 +2,43 @@ const { app, ipcMain, BrowserWindow } = require('electron')
 const userDataPath = app.getPath('userData')
 const fs = require('fs').promises // Using fs.promises for Promise-based API
 const path = require('path')
-const { rimraf, rimrafSync, native, nativeSync } = require('rimraf')
+const { rimraf } = require('rimraf')
 
 export function getNoteDir() {
   return path.join(userDataPath, 'notes')
+}
+
+async function getConfigData(configPath) {
+  try {
+    const data = await fs.readFile(configPath, 'utf8')
+    const jsonData = JSON.parse(data)
+    return jsonData
+  } catch (error) {
+    if (error.code === 'ENOENT') {
+      return {}
+    } else {
+      console.error(`Error reading or parsing JSON file: ${error.message}`)
+    }
+  }
+}
+
+async function writeEmoji(ecode, configPath, sname) {
+  try {
+    const configData = await getConfigData(configPath)
+    if (
+      typeof configData.emojis === 'object' &&
+      !Array.isArray(configData.emojis) &&
+      configData.emojis !== null
+    ) {
+      configData.emojis[sname] = ecode
+    } else {
+      configData.emojis = {}
+      configData.emojis[sname] = ecode
+    }
+    await fs.writeFile(configPath, JSON.stringify(configData), { flag: 'w' })
+  } catch (error) {
+    console.error(`Error writing to config file: ${error.message}`)
+  }
 }
 
 const noteDirectory = getNoteDir()
@@ -47,8 +80,10 @@ ipcMain.handle('create-note', async (event, ...args) => {
 
 ipcMain.handle('create-section', async (event, ...args) => {
   try {
-    const { spath, sname } = args[0]
+    const { spath, sname, ecode } = args[0]
+    console.log(ecode)
     const sectionPath = path.join(noteDirectory, ...spath, sname)
+    const configPath = path.join(noteDirectory, ...spath, 'config.json')
     try {
       await fs.access(sectionPath)
       throw new Error(`Section "${sname}" already exists.`)
@@ -59,6 +94,9 @@ ipcMain.handle('create-section', async (event, ...args) => {
     }
 
     await fs.mkdir(sectionPath)
+    if (ecode !== null) {
+      writeEmoji(ecode, configPath, sname)
+    }
     console.log(`Section "${sname}" created.`)
     return { success: true }
   } catch (error) {
@@ -72,10 +110,15 @@ ipcMain.handle('get-dir-contents', async (event, ...args) => {
     const { dPath } = args[0]
     const dirPath = path.join(noteDirectory, ...dPath)
     const dirents = await fs.readdir(dirPath, { withFileTypes: true })
-
+    const configPath = path.join(dirPath, 'config.json')
+    const configData = await getConfigData(configPath)
     const files = dirents.map((dirent) => ({
       name: dirent.name,
-      type: dirent.isDirectory() ? 'directory' : 'file'
+      type: dirent.isDirectory() ? 'directory' : 'file',
+      ecode:
+        configData.emojis && dirent.name in configData.emojis
+          ? configData.emojis[dirent.name]
+          : null
     }))
     return files
   } catch (error) {

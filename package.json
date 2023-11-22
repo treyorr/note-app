@@ -20,13 +20,18 @@
   "dependencies": {
     "@electron-toolkit/preload": "^2.0.0",
     "@electron-toolkit/utils": "^2.0.0",
+    "@emoji-mart/data": "^1.1.2",
+    "@emoji-mart/react": "^1.1.1",
     "@mantine/core": "^7.2.2",
     "@mantine/form": "^7.2.2",
     "@mantine/hooks": "^7.2.2",
     "@mantine/notifications": "^7.2.2",
     "@tabler/icons-react": "^2.40.0",
     "clsx": "^2.0.0",
+    "electron-store": "^8.1.0",
     "electron-updater": "^6.1.1",
+    "emoji-mart": "^5.5.2",
+    "emoji-picker-react": "^4.5.16",
     "mantine-contextmenu": "^7.1.12",
     "rimraf": "^5.0.5"
   },

@@ -118,7 +118,17 @@ export function Entity({ path = [], self: entitySelf = null, updateParent }) {
         fullWidth
         justify="left"
         leftSection={
-          entitySelf.type == 'directory' ? <IconFolder size={20} /> : <IconFile size={20} />
+          entitySelf.type == 'directory' ? (
+            entitySelf.ecode ? (
+              <p style={{ px: 6 }}>
+                <em-emoji size={18} shortcodes={entitySelf.ecode}></em-emoji>
+              </p>
+            ) : (
+              <IconFolder size={24} />
+            )
+          ) : (
+            <IconFile size={24} />
+          )
         }
         variant={
           (entitySelf.type == 'directory' && isOpen) || isThisCurrentOpenFile()

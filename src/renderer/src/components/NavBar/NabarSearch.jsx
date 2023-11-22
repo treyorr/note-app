@@ -16,6 +16,10 @@ import classes from './NavbarSearch.module.css'
 import React, { useEffect, useState } from 'react'
 import { AddNewCollection } from './Forms/AddNewCollection'
 import { Entity } from './Entity/Entity'
+import data from '@emoji-mart/data'
+import { init } from 'emoji-mart'
+
+init({ data })
 
 export function NavbarSearch() {
   const [opened, { open, close }] = useDisclosure(false)
