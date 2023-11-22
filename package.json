@@ -23,10 +23,12 @@
     "@mantine/core": "^7.2.2",
     "@mantine/form": "^7.2.2",
     "@mantine/hooks": "^7.2.2",
+    "@mantine/notifications": "^7.2.2",
     "@tabler/icons-react": "^2.40.0",
     "clsx": "^2.0.0",
     "electron-updater": "^6.1.1",
-    "mantine-contextmenu": "^7.1.12"
+    "mantine-contextmenu": "^7.1.12",
+    "rimraf": "^5.0.5"
   },
   "devDependencies": {
     "@electron-toolkit/eslint-config": "^1.0.1",
@@ -38,6 +40,7 @@
     "eslint": "^8.47.0",
     "eslint-plugin-react": "^7.33.2",
     "postcss": "^8.4.31",
+    "postcss-import": "^15.1.0",
     "postcss-preset-mantine": "^1.11.0",
     "postcss-simple-vars": "^7.0.1",
     "prettier": "^3.0.2",

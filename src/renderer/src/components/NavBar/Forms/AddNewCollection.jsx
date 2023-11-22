@@ -2,7 +2,7 @@
 import { TextInput, Group, Button } from '@mantine/core'
 import { useForm } from '@mantine/form'
 
-export function AddCollectionForm({ collections, close }) {
+export function AddNewCollection({ collections, close, fetchCollections }) {
   const form = useForm({
     validateInputOnChange: true,
     initialValues: {
@@ -19,9 +19,14 @@ export function AddCollectionForm({ collections, close }) {
   })
 
   async function createCollection(values) {
+    let args = {
+      spath: [],
+      sname: values.name
+    }
     try {
-      const response = await window.electron.ipcRenderer.invoke('createCollection', values)
+      const response = await window.electron.ipcRenderer.invoke('create-section', args)
       if (response.success) {
+        fetchCollections()
         close()
       } else {
         throw response.error

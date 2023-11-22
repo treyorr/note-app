@@ -1,6 +1,6 @@
 import { useForm } from '@mantine/form'
 import { Group, Button, TextInput } from '@mantine/core'
-export function AddNewNoteForm({ path, close, updateContents }) {
+export function AddNewSectionForm({ path, close, updateContents, openOnAdd }) {
   const form = useForm({
     validateInputOnChange: true,
     initialValues: {
@@ -11,13 +11,13 @@ export function AddNewNoteForm({ path, close, updateContents }) {
     }
   })
 
-  async function createNote(values) {
+  async function createSection(values) {
     let args = {
-      fpath: path,
-      fname: values.name
+      spath: path,
+      sname: values.name
     }
     try {
-      const response = await window.electron.ipcRenderer.invoke('create-note', args)
+      const response = await window.electron.ipcRenderer.invoke('create-section', args)
       if (response.success) {
         updateContents()
         close()
@@ -30,11 +30,11 @@ export function AddNewNoteForm({ path, close, updateContents }) {
   }
 
   return (
-    <form onSubmit={form.onSubmit((values) => createNote(values))}>
+    <form onSubmit={form.onSubmit((values) => createSection(values))}>
       <TextInput
         label="Name"
         data-autofocus
-        placeholder="Quantum Tunneling"
+        placeholder="General Relativity"
         {...form.getInputProps('name')}
       />
       <Group justify="flex-end" mt="md">

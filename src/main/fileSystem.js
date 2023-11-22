@@ -2,22 +2,23 @@ const { app, ipcMain, BrowserWindow } = require('electron')
 const userDataPath = app.getPath('userData')
 const fs = require('fs').promises // Using fs.promises for Promise-based API
 const path = require('path')
+const { rimraf, rimrafSync, native, nativeSync } = require('rimraf')
 
 export function getNoteDir() {
   return path.join(userDataPath, 'notes')
 }
 
-export async function setUpFileSystem() {
-  const notesDirectory = getNoteDir()
+const noteDirectory = getNoteDir()
 
+export async function setUpFileSystem() {
   try {
-    await fs.access(notesDirectory)
+    await fs.access(noteDirectory)
   } catch (error) {
     if (error.code === 'ENOENT') {
       // Directory does not exist, create it
       try {
-        await fs.mkdir(notesDirectory, { recursive: true })
-        console.log(`Directory "${notesDirectory}" created.`)
+        await fs.mkdir(noteDirectory, { recursive: true })
+        console.log(`Directory "${noteDirectory}" created.`)
       } catch (mkdirError) {
         console.error(`Error creating directory: ${mkdirError.message}`)
       }
@@ -27,51 +28,10 @@ export async function setUpFileSystem() {
   }
 }
 
-ipcMain.handle('get-collections', async () => {
-  try {
-    const notesDirectory = getNoteDir()
-    const dirents = await fs.readdir(notesDirectory, { withFileTypes: true })
-    const files = dirents
-      .filter((dirent) => dirent.isDirectory())
-      .map((dirent) => ({
-        name: dirent.name,
-        type: dirent.isDirectory() ? 'directory' : 'file'
-      }))
-    return files
-  } catch (error) {
-    console.error('Error reading collection names:', error)
-    return []
-  }
-})
-
-ipcMain.handle('createCollection', async (event, collection) => {
-  try {
-    const notesDirectory = getNoteDir()
-    const newDirPath = path.join(notesDirectory, collection.name)
-
-    try {
-      await fs.access(newDirPath)
-      throw new Error(`Collection "${collection.name}" already exists.`)
-    } catch (error) {
-      if (error.code !== 'ENOENT') {
-        throw error
-      }
-    }
-
-    await fs.mkdir(newDirPath)
-    console.log(`Directory "${collection.name}" created.`)
-    event.sender.send('new_collection')
-    return { success: true }
-  } catch (error) {
-    console.error(`Error creating directory: ${error.message}`)
-    return { success: false, error: error.message }
-  }
-})
-
 ipcMain.handle('create-note', async (event, ...args) => {
   try {
     const { fpath, fname } = args[0]
-    const notePath = path.join(getNoteDir(), ...fpath, fname + '.json')
+    const notePath = path.join(noteDirectory, ...fpath, fname + '.json')
     await fs.writeFile(notePath, '', { flag: 'ax' })
     console.log(`Note "${fname}" created.`)
     return { success: true }
@@ -88,7 +48,7 @@ ipcMain.handle('create-note', async (event, ...args) => {
 ipcMain.handle('create-section', async (event, ...args) => {
   try {
     const { spath, sname } = args[0]
-    const sectionPath = path.join(getNoteDir(), ...spath, sname)
+    const sectionPath = path.join(noteDirectory, ...spath, sname)
     try {
       await fs.access(sectionPath)
       throw new Error(`Section "${sname}" already exists.`)
@@ -110,7 +70,7 @@ ipcMain.handle('create-section', async (event, ...args) => {
 ipcMain.handle('get-dir-contents', async (event, ...args) => {
   try {
     const { dPath } = args[0]
-    const dirPath = path.join(getNoteDir(), ...dPath)
+    const dirPath = path.join(noteDirectory, ...dPath)
     const dirents = await fs.readdir(dirPath, { withFileTypes: true })
 
     const files = dirents.map((dirent) => ({
@@ -120,6 +80,32 @@ ipcMain.handle('get-dir-contents', async (event, ...args) => {
     return files
   } catch (error) {
     console.error(`Error reading directory: ${error.message}`)
+    return { success: false, error: error.message }
+  }
+})
+
+ipcMain.handle('delete-section', async (event, ...args) => {
+  try {
+    const { sPath } = args[0]
+    const dirPath = path.join(noteDirectory, ...sPath)
+    rimraf(dirPath, { glob: false })
+    console.log(`Section "${dirPath}" deleted.`)
+    return { success: true }
+  } catch (error) {
+    console.error(`Error deleting section: ${error.message}`)
+    return { success: false, error: error.message }
+  }
+})
+
+ipcMain.handle('delete-note', async (event, ...args) => {
+  try {
+    const { nPath } = args[0]
+    const notePath = path.join(noteDirectory, ...nPath)
+    fs.unlink(notePath)
+    console.log(`Note "${notePath}" deleted.`)
+    return { success: true }
+  } catch (error) {
+    console.error(`Error deleting note: ${error.message}`)
     return { success: false, error: error.message }
   }
 })

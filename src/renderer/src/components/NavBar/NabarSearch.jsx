@@ -14,7 +14,7 @@ import { IconSearch, IconPlus } from '@tabler/icons-react'
 import { UserButton } from './UserButton/UserButton'
 import classes from './NavbarSearch.module.css'
 import React, { useEffect, useState } from 'react'
-import { AddCollectionForm } from './AddCollectionForm/AddCollectionForm'
+import { AddNewCollection } from './Forms/AddNewCollection'
 import { Entity } from './Entity/Entity'
 
 export function NavbarSearch() {
@@ -23,9 +23,11 @@ export function NavbarSearch() {
 
   const fetchCollections = async () => {
     try {
-      const collections = await window.electron.ipcRenderer.invoke('get-collections')
-      console.log(collections)
-      setCollections(collections)
+      let args = {
+        dPath: []
+      }
+      const response = await window.electron.ipcRenderer.invoke('get-dir-contents', args)
+      setCollections(response)
     } catch (error) {
       console.error('Error fetching collections:', error)
     }
@@ -33,20 +35,16 @@ export function NavbarSearch() {
 
   useEffect(() => {
     fetchCollections()
-
-    window.electron.ipcRenderer.removeAllListeners('new-collection')
-
-    window.electron.ipcRenderer.on('new-collection', () => fetchCollections())
-
-    return () => {
-      window.electron.ipcRenderer.removeAllListeners('new-collection')
-    }
   }, []) // Run once on component mount
 
   return (
     <>
       <Drawer opened={opened} size="xs" onClose={close} title="Create A New Collection">
-        <AddCollectionForm collections={collections} close={close} />
+        <AddNewCollection
+          collections={collections}
+          close={close}
+          fetchCollections={fetchCollections}
+        />
       </Drawer>
       <nav className={classes.navbar}>
         <div className={classes.section}>
@@ -76,7 +74,12 @@ export function NavbarSearch() {
           </Group>
           <div className={classes.collections}>
             {collections.map((collection) => (
-              <Entity key={collection.name} path={[]} self={collection} />
+              <Entity
+                key={collection.name}
+                path={[]}
+                self={collection}
+                updateParent={fetchCollections}
+              />
             ))}
           </div>
         </div>

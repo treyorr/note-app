@@ -3,12 +3,13 @@ import { useDisclosure } from '@mantine/hooks'
 import classes from './Collection.module.css'
 import { useState } from 'react'
 import { useContextMenu } from 'mantine-contextmenu'
-import { IconFile, IconFolder } from '@tabler/icons-react'
-import { AddNewNoteForm } from '../Note/AddNewNote'
+import { IconFile, IconFolder, IconTrash } from '@tabler/icons-react'
+import { AddNewNoteForm } from '../Forms/AddNewNote'
 import { useFileContext } from '../../../FileContext'
-import { AddNewSectionForm } from '../Section/AddNewSection'
+import { AddNewSectionForm } from '../Forms/AddNewSection'
+import { notifications } from '@mantine/notifications'
 
-export function Entity({ path = [], self: entitySelf = null }) {
+export function Entity({ path = [], self: entitySelf = null, updateParent }) {
   const [addNoteOpened, addNoteHandlers] = useDisclosure(false)
   const [addSectionOpened, addSectionHandlers] = useDisclosure(false)
   const { showContextMenu } = useContextMenu()
@@ -23,12 +24,54 @@ export function Entity({ path = [], self: entitySelf = null }) {
     return combinedSelfString == combinedOpenString
   }
   async function updateContents() {
-    if (isOpen) {
+    let args = {
+      dPath: [...path, entitySelf.name]
+    }
+    const response = await window.electron.ipcRenderer.invoke('get-dir-contents', args)
+    setDirContents(response)
+    if (!isOpen) {
+      setIsOpen(true)
+    }
+  }
+  async function deleteEntity() {
+    let response = null
+    if (entitySelf.type == 'directory') {
       let args = {
-        dPath: [...path, entitySelf.name]
+        sPath: [...path, entitySelf.name]
       }
-      const response = await window.electron.ipcRenderer.invoke('get-dir-contents', args)
-      setDirContents(response)
+      response = await window.electron.ipcRenderer.invoke('delete-section', args)
+    } else {
+      let args = {
+        nPath: [...path, entitySelf.name]
+      }
+      response = await window.electron.ipcRenderer.invoke('delete-note', args)
+    }
+    if (response.success) {
+      notifications.show({
+        id: 'success',
+        withCloseButton: true,
+        autoClose: 5000,
+        title: 'Successful delete',
+        message: `You've deleted ${entitySelf.name} successfully`,
+        color: 'green',
+        className: 'my-notification-class',
+        loading: false
+      })
+      if (isThisCurrentOpenFile()) {
+        setFile([])
+      }
+      updateParent()
+    } else {
+      notifications.show({
+        id: 'failure',
+        withCloseButton: true,
+        autoClose: 5000,
+        title: 'Error during delete',
+        message: `There was an error deleting ${entitySelf.name}`,
+        color: 'red',
+        className: 'my-notification-class',
+        loading: false
+      })
     }
   }
 
@@ -74,16 +117,19 @@ export function Entity({ path = [], self: entitySelf = null }) {
       <Button
         fullWidth
         justify="left"
+        leftSection={
+          entitySelf.type == 'directory' ? <IconFolder size={20} /> : <IconFile size={20} />
+        }
         variant={
           (entitySelf.type == 'directory' && isOpen) || isThisCurrentOpenFile()
-            ? 'light'
-            : 'transparent'
+            ? 'filled'
+            : 'subtle'
         }
         size="compact-md"
         key={path.label}
         className={classes.collectionButton}
         onClick={handleClick}
-        color={entitySelf.type == 'directory' ? 'gray' : isThisCurrentOpenFile() ? 'cyan' : ''}
+        color={isThisCurrentOpenFile() ? 'teal' : 'gray'}
         onContextMenu={showContextMenu(
           [
             {
@@ -99,11 +145,20 @@ export function Entity({ path = [], self: entitySelf = null }) {
               hidden: entitySelf.type == 'file',
               icon: <IconFolder size={20} />,
               onClick: () => addSectionHandlers.open()
+            },
+            { key: 'divider' },
+            {
+              key: 'delete',
+              title: 'Delete',
+              color: 'red',
+              icon: <IconTrash size={20} />,
+              onClick: () => deleteEntity(),
+              style: () => ({ color: 'red' })
             }
           ],
           {
             styles: {
-              item: { padding: '4px', c: 'grey.2' }
+              item: { padding: '4px' }
             }
           }
         )}
@@ -114,7 +169,11 @@ export function Entity({ path = [], self: entitySelf = null }) {
         dirContents.map((dirContent, i) => {
           return (
             <div key={i} style={{ borderLeft: '1px solid white', marginLeft: '10px' }}>
-              <Entity path={[...path, entitySelf.name]} self={dirContent} />
+              <Entity
+                path={[...path, entitySelf.name]}
+                self={dirContent}
+                updateParent={updateContents}
+              />
             </div>
           )
         })}
