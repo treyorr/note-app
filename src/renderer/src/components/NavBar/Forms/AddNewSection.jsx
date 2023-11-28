@@ -69,7 +69,7 @@ export function AddNewSectionForm({ path, close, updateContents }) {
         <Group justify="flex-end" mt="md">
           <Button
             disabled={form.getTransformedValues().name.length == 0}
-            color="teal"
+            color="green"
             type="submit"
           >
             Create

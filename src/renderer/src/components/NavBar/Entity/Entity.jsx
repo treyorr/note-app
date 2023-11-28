@@ -17,6 +17,14 @@ export function Entity({ path = [], self: entitySelf = null, updateParent }) {
   const [dirContents, setDirContents] = useState([])
   const { currentOpenFile, setFile } = useFileContext()
 
+  function getShowName() {
+    if (entitySelf.type == 'file') {
+      const parts = entitySelf.name.split('.')
+      const filenameWithoutExtension = parts.slice(0, -1).join('.')
+      return filenameWithoutExtension
+    }
+    return entitySelf.name
+  }
   function isThisCurrentOpenFile() {
     const combinedSelfString = [...path, entitySelf.name].join('')
     const combinedOpenString = currentOpenFile.join('')
@@ -139,7 +147,7 @@ export function Entity({ path = [], self: entitySelf = null, updateParent }) {
         key={path.label}
         className={classes.collectionButton}
         onClick={handleClick}
-        color={isThisCurrentOpenFile() ? 'teal' : 'gray'}
+        color={isThisCurrentOpenFile() ? 'green' : 'gray'}
         onContextMenu={showContextMenu(
           [
             {
@@ -173,7 +181,7 @@ export function Entity({ path = [], self: entitySelf = null, updateParent }) {
           }
         )}
       >
-        {entitySelf.name}
+        {getShowName()}
       </Button>
       {isOpen &&
         dirContents.map((dirContent, i) => {

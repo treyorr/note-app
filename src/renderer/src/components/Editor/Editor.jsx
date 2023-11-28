@@ -13,8 +13,9 @@ import { Button, Text } from '@mantine/core'
 export function NoteEditor() {
   const [editable, setEditable] = useState(false)
   const [noteContentLoaded, setNoteContentLoaded] = useState(false)
-  const { currentOpenFile, setFile } = useFileContext()
+  const { currentOpenFile } = useFileContext()
   const [filePath, setFilePath] = useState(null)
+  const [date, setDate] = useState('')
 
   const editor = useEditor({
     extensions: [
@@ -28,6 +29,21 @@ export function NoteEditor() {
     ],
     content: null
   })
+
+  function getPathText() {
+    const pathBeforeFile = currentOpenFile.slice(0, -1).join(' / ')
+    const fileName = currentOpenFile.at(-1)
+    const parts = fileName.split('.')
+    const fileNameWithoutExtension = parts.slice(0, -1).join('.')
+    return (
+      <Text c="gray.6">
+        {pathBeforeFile} /{' '}
+        <Text span c="white" fw={600} inherit>
+          {fileNameWithoutExtension}
+        </Text>
+      </Text>
+    )
+  }
 
   async function handleSave() {
     if (editor) {
@@ -57,6 +73,7 @@ export function NoteEditor() {
         if (response && response.success) {
           setFilePath(currentOpenFile)
           editor.commands.setContent(response.data)
+          setDate(response.date)
         }
       } catch (error) {
         console.error('Error fetching note content:', error)
@@ -140,11 +157,12 @@ export function NoteEditor() {
             </>
           ) : (
             <>
-              <Text>{currentOpenFile.join(' / ')}</Text>
+              <Text>{getPathText()}</Text>
+              <Text style={{ marginLeft: 'auto' }}>{date}</Text>
               <Button
                 size="compact-sm"
-                style={{ marginLeft: 'auto' }}
-                color="blue"
+                variant="outline"
+                color="gray"
                 onClick={() => setEditable(true)}
               >
                 Edit

@@ -190,7 +190,14 @@ ipcMain.handle('get-note-content', async (event, ...args) => {
     const notePath = path.join(noteDirectory, ...nPath)
     const response = await fs.readFile(notePath)
     const fileContentString = response.toString('utf-8')
-    return { success: true, data: fileContentString }
+    const stats = await fs.stat(notePath)
+    const mtimeDate = new Date(stats.mtime)
+    const formattedDate = mtimeDate.toLocaleDateString('en-US', {
+      month: '2-digit',
+      day: '2-digit',
+      year: 'numeric'
+    })
+    return { success: true, data: fileContentString, date: formattedDate }
   } catch (error) {
     console.log(`Error getting note contents: ${error.message}`)
     return { success: false, error: error.message }

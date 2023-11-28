@@ -38,7 +38,7 @@ export function AddNewNoteForm({ path, close, updateContents }) {
         {...form.getInputProps('name')}
       />
       <Group justify="flex-end" mt="md">
-        <Button disabled={form.getTransformedValues().name.length == 0} color="teal" type="submit">
+        <Button disabled={form.getTransformedValues().name.length == 0} color="green" type="submit">
           Create
         </Button>
       </Group>
