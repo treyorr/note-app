@@ -41,6 +41,16 @@ async function writeEmoji(ecode, configPath, sname) {
   }
 }
 
+async function deleteEmoji(configPath, sname) {
+  try {
+    const configData = await getConfigData(configPath)
+    delete configData.emojis[sname]
+    await fs.writeFile(configPath, JSON.stringify(configData), { flag: 'w' })
+  } catch (error) {
+    console.error(`Error deleting emoji: ${error.message}`)
+  }
+}
+
 const noteDirectory = getNoteDir()
 
 export async function setUpFileSystem() {
@@ -64,7 +74,7 @@ export async function setUpFileSystem() {
 ipcMain.handle('create-note', async (event, ...args) => {
   try {
     const { fpath, fname } = args[0]
-    const notePath = path.join(noteDirectory, ...fpath, fname + '.json')
+    const notePath = path.join(noteDirectory, ...fpath, fname + '.html')
     await fs.writeFile(notePath, '', { flag: 'ax' })
     console.log(`Note "${fname}" created.`)
     return { success: true }
@@ -112,14 +122,16 @@ ipcMain.handle('get-dir-contents', async (event, ...args) => {
     const dirents = await fs.readdir(dirPath, { withFileTypes: true })
     const configPath = path.join(dirPath, 'config.json')
     const configData = await getConfigData(configPath)
-    const files = dirents.map((dirent) => ({
-      name: dirent.name,
-      type: dirent.isDirectory() ? 'directory' : 'file',
-      ecode:
-        configData.emojis && dirent.name in configData.emojis
-          ? configData.emojis[dirent.name]
-          : null
-    }))
+    const files = dirents
+      .filter((dirent) => dirent.name !== 'config.json')
+      .map((dirent) => ({
+        name: dirent.name,
+        type: dirent.isDirectory() ? 'directory' : 'file',
+        ecode:
+          configData.emojis && dirent.name in configData.emojis
+            ? configData.emojis[dirent.name]
+            : null
+      }))
     return files
   } catch (error) {
     console.error(`Error reading directory: ${error.message}`)
@@ -132,6 +144,13 @@ ipcMain.handle('delete-section', async (event, ...args) => {
     const { sPath } = args[0]
     const dirPath = path.join(noteDirectory, ...sPath)
     rimraf(dirPath, { glob: false })
+    let configPath = ''
+    if (sPath.length > 1) {
+      configPath = path.join(noteDirectory, path.join(...sPath.slice(0, -1)), 'config.json')
+    } else {
+      configPath = path.join(noteDirectory, 'config.json')
+    }
+    deleteEmoji(configPath, sPath.at(-1))
     console.log(`Section "${dirPath}" deleted.`)
     return { success: true }
   } catch (error) {
@@ -149,6 +168,31 @@ ipcMain.handle('delete-note', async (event, ...args) => {
     return { success: true }
   } catch (error) {
     console.error(`Error deleting note: ${error.message}`)
+    return { success: false, error: error.message }
+  }
+})
+
+ipcMain.handle('save-note-content', async (event, ...args) => {
+  try {
+    const { nPath, content } = args[0]
+    const notePath = path.join(noteDirectory, ...nPath)
+    await fs.writeFile(notePath, content)
+    return { success: true }
+  } catch (error) {
+    console.log(`Error getting note contents: ${error.message}`)
+    return { success: false, error: error.message }
+  }
+})
+
+ipcMain.handle('get-note-content', async (event, ...args) => {
+  try {
+    const { nPath } = args[0]
+    const notePath = path.join(noteDirectory, ...nPath)
+    const response = await fs.readFile(notePath)
+    const fileContentString = response.toString('utf-8')
+    return { success: true, data: fileContentString }
+  } catch (error) {
+    console.log(`Error getting note contents: ${error.message}`)
     return { success: false, error: error.message }
   }
 })

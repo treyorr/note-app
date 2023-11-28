@@ -9,6 +9,7 @@ import { FileProvider } from './FileContext'
 import '@mantine/core/styles.css'
 import 'mantine-contextmenu/styles.css'
 import '@mantine/notifications/styles.css'
+import '@mantine/tiptap/styles.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

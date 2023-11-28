@@ -1,6 +1,6 @@
 import { useForm } from '@mantine/form'
 import { Group, Button, TextInput } from '@mantine/core'
-export function AddNewNoteForm({ path, close, updateContents, openOnAdd }) {
+export function AddNewNoteForm({ path, close, updateContents }) {
   const form = useForm({
     validateInputOnChange: true,
     initialValues: {
