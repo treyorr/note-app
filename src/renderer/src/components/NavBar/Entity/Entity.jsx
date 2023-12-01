@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { useContextMenu } from 'mantine-contextmenu'
 import { IconFile, IconFolder, IconTrash } from '@tabler/icons-react'
 import { AddNewNoteForm } from '../Forms/AddNewNote'
-import { useFileContext } from '../../../FileContext'
+import { useFileContext } from '../../../context/FileContext'
 import { AddNewSectionForm } from '../Forms/AddNewSection'
 import { notifications } from '@mantine/notifications'
 
@@ -27,7 +27,7 @@ export function Entity({ path = [], self: entitySelf = null, updateParent }) {
   }
   function isThisCurrentOpenFile() {
     const combinedSelfString = [...path, entitySelf.name].join('')
-    const combinedOpenString = currentOpenFile.join('')
+    const combinedOpenString = currentOpenFile ? currentOpenFile.join('') : ''
 
     return combinedSelfString == combinedOpenString
   }

@@ -1,14 +1,4 @@
-import {
-  TextInput,
-  Code,
-  Text,
-  Group,
-  ActionIcon,
-  Tooltip,
-  rem,
-  Button,
-  Drawer
-} from '@mantine/core'
+import { TextInput, Code, Text, Group, ActionIcon, Tooltip, rem, Drawer } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import { IconSearch, IconPlus } from '@tabler/icons-react'
 import { UserButton } from './UserButton/UserButton'

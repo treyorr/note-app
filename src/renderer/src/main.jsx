@@ -5,7 +5,8 @@ import { Notifications } from '@mantine/notifications'
 import { ContextMenuProvider } from 'mantine-contextmenu'
 import ReactDOM from 'react-dom/client'
 import App from './App'
-import { FileProvider } from './FileContext'
+import { FileProvider } from './context/FileContext'
+import { ConfigProvider } from './context/ConfigContext'
 import '@mantine/core/styles.css'
 import 'mantine-contextmenu/styles.css'
 import '@mantine/notifications/styles.css'
@@ -16,8 +17,10 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <MantineProvider defaultColorScheme="dark">
       <ContextMenuProvider shadow="md">
         <FileProvider>
-          <Notifications />
-          <App />
+          <ConfigProvider>
+            <Notifications />
+            <App />
+          </ConfigProvider>
         </FileProvider>
       </ContextMenuProvider>
     </MantineProvider>

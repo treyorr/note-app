@@ -1,10 +1,13 @@
 import { UnstyledButton, Group, Avatar, Text, rem } from '@mantine/core'
 import { IconChevronRight } from '@tabler/icons-react'
 import classes from './UserButton.module.css'
+import { useFileContext } from '../../../context/FileContext'
 
 export function UserButton() {
+  const { setFile } = useFileContext()
+
   return (
-    <UnstyledButton className={classes.user}>
+    <UnstyledButton onClick={() => setFile(null)} className={classes.user}>
       <Group>
         <Avatar radius="xl" />
 

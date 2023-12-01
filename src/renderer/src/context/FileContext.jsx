@@ -3,7 +3,7 @@ import React, { createContext, useContext, useState } from 'react'
 const FileContext = createContext()
 
 export const FileProvider = ({ children }) => {
-  const [currentOpenFile, setCurrentOpenFile] = useState([])
+  const [currentOpenFile, setCurrentOpenFile] = useState(null)
 
   const setFile = (filePath) => {
     setCurrentOpenFile(filePath)
