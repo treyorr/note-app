@@ -9,6 +9,7 @@ import SubScript from '@tiptap/extension-subscript'
 import { useState, useEffect } from 'react'
 import { useFileContext } from '../../FileContext'
 import { Button, Text } from '@mantine/core'
+import { IconDeviceFloppy, IconEdit } from '@tabler/icons-react'
 
 export function NoteEditor() {
   const [editable, setEditable] = useState(false)
@@ -101,12 +102,18 @@ export function NoteEditor() {
     <div
       style={{
         display: 'flex',
-        justifyContent: 'center',
+        flexDirection: 'column',
+        alignItems: 'center',
+        height: '100vh',
         overflow: 'auto'
       }}
     >
-      <RichTextEditor w={'85%'} editor={editor}>
-        <RichTextEditor.Toolbar sticky w={'100%'} style={{ justifyContent: 'center' }}>
+      <RichTextEditor mt="40px" mb="10px" w={'85%'} editor={editor}>
+        <RichTextEditor.Toolbar
+          sticky
+          w={'100%'}
+          style={{ justifyContent: 'center', top: 0, zIndex: 100 }}
+        >
           {editable ? (
             <>
               <RichTextEditor.ControlsGroup>
@@ -150,6 +157,7 @@ export function NoteEditor() {
                 size="compact-sm"
                 color="green"
                 style={{ marginLeft: 'auto' }}
+                leftSection={<IconDeviceFloppy size={16} />}
                 onClick={() => handleSave()}
               >
                 Save
@@ -158,11 +166,14 @@ export function NoteEditor() {
           ) : (
             <>
               <Text>{getPathText()}</Text>
-              <Text style={{ marginLeft: 'auto' }}>{date}</Text>
+              <Text c="gray.6" style={{ marginLeft: 'auto' }}>
+                {date}
+              </Text>
               <Button
                 size="compact-sm"
                 variant="outline"
                 color="gray"
+                leftSection={<IconEdit size={16} />}
                 onClick={() => setEditable(true)}
               >
                 Edit
