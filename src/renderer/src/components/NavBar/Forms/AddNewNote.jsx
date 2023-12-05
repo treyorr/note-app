@@ -1,6 +1,10 @@
 import { useForm } from '@mantine/form'
 import { Group, Button, TextInput } from '@mantine/core'
+import { useConfigContext } from '../../../context/ConfigContext'
+import { getNoteHeader } from './createNoteHelper'
+
 export function AddNewNoteForm({ path, close, updateContents }) {
+  const { config } = useConfigContext()
   const form = useForm({
     validateInputOnChange: true,
     initialValues: {
@@ -14,7 +18,8 @@ export function AddNewNoteForm({ path, close, updateContents }) {
   async function createNote(values) {
     let args = {
       fpath: path,
-      fname: values.name
+      fname: values.name,
+      fheader: getNoteHeader(config, values.name)
     }
     try {
       const response = await window.electron.ipcRenderer.invoke('create-note', args)

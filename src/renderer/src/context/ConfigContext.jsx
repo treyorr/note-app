@@ -1,13 +1,26 @@
-import React, { createContext, useContext, useState } from 'react'
+import React, { createContext, useContext, useEffect, useState } from 'react'
 
 const ConfigContext = createContext()
 
 export const ConfigProvider = ({ children }) => {
   const [config, setConfiguration] = useState({})
 
-  const setConfig = (config) => {
-    setConfiguration(config)
+  const setConfig = async (config) => {
+    const response = await window.electron.ipcRenderer.invoke('save-config-data', config)
+    if (response.success) {
+      setConfiguration(config)
+    }
   }
+
+  useEffect(() => {
+    async function getConfigData() {
+      const response = await window.electron.ipcRenderer.invoke('get-config-data')
+      if (response.success) {
+        setConfiguration(response.data)
+      }
+    }
+    getConfigData()
+  }, [])
 
   return <ConfigContext.Provider value={{ config, setConfig }}>{children}</ConfigContext.Provider>
 }

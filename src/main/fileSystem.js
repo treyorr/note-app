@@ -73,9 +73,9 @@ export async function setUpFileSystem() {
 
 ipcMain.handle('create-note', async (event, ...args) => {
   try {
-    const { fpath, fname } = args[0]
+    const { fpath, fname, fheader } = args[0]
     const notePath = path.join(noteDirectory, ...fpath, fname + '.html')
-    await fs.writeFile(notePath, '', { flag: 'ax' })
+    await fs.writeFile(notePath, fheader, { flag: 'ax' })
     console.log(`Note "${fname}" created.`)
     return { success: true }
   } catch (error) {
