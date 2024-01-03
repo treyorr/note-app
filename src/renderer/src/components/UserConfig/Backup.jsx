@@ -12,7 +12,7 @@ import {
   ScrollArea
 } from '@mantine/core'
 
-export function UserConfig() {
+export function Backup() {
   const { config, setConfig } = useConfigContext()
 
   const form = useForm({
@@ -38,7 +38,7 @@ export function UserConfig() {
       <form onSubmit={form.onSubmit((values) => applyConfiguration(values))}>
         <Center>
           <div style={{ width: '75%', marginTop: '30px' }}>
-            <Fieldset legend="Personal Information">
+            <Fieldset legend="GitHub Info">
               <TextInput
                 label="First Name"
                 placeholder="First Name"

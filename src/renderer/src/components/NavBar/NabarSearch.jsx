@@ -1,6 +1,16 @@
-import { TextInput, Code, Text, Group, ActionIcon, Tooltip, rem, Drawer } from '@mantine/core'
+import {
+  TextInput,
+  Pill,
+  Text,
+  Group,
+  ActionIcon,
+  Tooltip,
+  rem,
+  Drawer,
+  CloseButton
+} from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
-import { IconSearch, IconPlus } from '@tabler/icons-react'
+import { IconSearch, IconPlus, IconX } from '@tabler/icons-react'
 import { UserButton } from './UserButton/UserButton'
 import classes from './NavbarSearch.module.css'
 import React, { useEffect, useState } from 'react'
@@ -14,6 +24,11 @@ init({ data })
 export function NavbarSearch() {
   const [opened, { open, close }] = useDisclosure(false)
   const [collections, setCollections] = useState([])
+  const [filter, setFilter] = useState('')
+
+  const filteredCollections = collections.filter((c) =>
+    c.name.toLowerCase().includes(filter.toLowerCase())
+  )
 
   const fetchCollections = async () => {
     try {
@@ -48,17 +63,24 @@ export function NavbarSearch() {
         <TextInput
           placeholder="Search"
           size="xs"
+          value={filter}
+          onChange={(event) => setFilter(event.currentTarget.value)}
           leftSection={<IconSearch style={{ width: rem(12), height: rem(12) }} stroke={1.5} />}
-          rightSectionWidth={70}
-          rightSection={<Code className={classes.searchCode}>Ctrl + K</Code>}
-          styles={{ section: { pointerEvents: 'none' } }}
+          rightSection={
+            filter.length > 0 ? <CloseButton size="sm" onClick={() => setFilter('')} /> : null
+          }
           mb="sm"
         />
 
         <div className={classes.section}>
           <Group className={classes.collectionsHeader} justify="space-between">
             <Text size="xs" fw={500} c="dimmed">
-              Collections
+              Collections{' '}
+              {filter.length > 0 ? (
+                <Pill>
+                  {filteredCollections.length} / {collections.length}{' '}
+                </Pill>
+              ) : null}
             </Text>
             <Tooltip onClick={open} label="Create collection" withArrow position="right">
               <ActionIcon variant="default" size={18}>
@@ -67,7 +89,7 @@ export function NavbarSearch() {
             </Tooltip>
           </Group>
           <div className={classes.collections}>
-            {collections.map((collection) => (
+            {filteredCollections.map((collection) => (
               <Entity
                 key={collection.name}
                 path={[]}

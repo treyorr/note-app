@@ -8,7 +8,7 @@ import Superscript from '@tiptap/extension-superscript'
 import SubScript from '@tiptap/extension-subscript'
 import { useState, useEffect } from 'react'
 import { useFileContext } from '../../context/FileContext'
-import { Button, Text, Modal, Group } from '@mantine/core'
+import { Button, Text, Modal, Group, ScrollArea } from '@mantine/core'
 import { IconDeviceFloppy, IconEdit } from '@tabler/icons-react'
 import { useDisclosure } from '@mantine/hooks'
 
@@ -216,8 +216,9 @@ export function NoteEditor() {
               </>
             )}
           </RichTextEditor.Toolbar>
-
-          <RichTextEditor.Content />
+          <ScrollArea h="84vh">
+            <RichTextEditor.Content />
+          </ScrollArea>
         </RichTextEditor>
       </div>
     </>
