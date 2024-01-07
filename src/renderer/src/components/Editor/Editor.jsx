@@ -115,6 +115,16 @@ export function NoteEditor() {
     close()
   }
 
+  const handleLinkClick = (event) => {
+    const { target } = event
+
+    if (target.tagName.toLowerCase() === 'a') {
+      event.preventDefault() // Prevent default behavior (e.g., navigating within the editor)
+      const href = target.getAttribute('href')
+      window.shell.openExternal(href)
+    }
+  }
+
   if (!editor) {
     return null
   }
@@ -143,7 +153,7 @@ export function NoteEditor() {
           overflow: 'auto'
         }}
       >
-        <RichTextEditor mt="40px" mb="10px" w={'85%'} editor={editor}>
+        <RichTextEditor onClick={handleLinkClick} mt="40px" mb="10px" w={'85%'} editor={editor}>
           <RichTextEditor.Toolbar
             sticky
             w={'100%'}
