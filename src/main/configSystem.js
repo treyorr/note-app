@@ -10,10 +10,21 @@ const schema = {
     type: 'string',
     default: 'Doe'
   },
-
   fileHeader: {
     type: 'number',
     default: 0
+  },
+  ghUsername: {
+    type: 'string',
+    default: ''
+  },
+  ghPassword: {
+    type: 'string',
+    default: ''
+  },
+  ghRepo: {
+    type: 'string',
+    default: ''
   }
 }
 

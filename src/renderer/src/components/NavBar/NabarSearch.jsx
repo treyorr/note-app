@@ -61,7 +61,7 @@ export function NavbarSearch() {
         </div>
 
         <TextInput
-          placeholder="Search"
+          placeholder="Collection Search"
           size="xs"
           value={filter}
           onChange={(event) => setFilter(event.currentTarget.value)}

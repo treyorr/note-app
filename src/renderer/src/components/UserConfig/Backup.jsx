@@ -1,30 +1,31 @@
 import { useForm } from '@mantine/form'
 import { useConfigContext } from '../../context/ConfigContext'
-import {
-  Button,
-  Center,
-  Fieldset,
-  TextInput,
-  Text,
-  UnstyledButton,
-  Box,
-  Divider,
-  ScrollArea
-} from '@mantine/core'
+import { Button, Center, Fieldset, TextInput, ScrollArea, PasswordInput } from '@mantine/core'
 
 export function Backup() {
   const { config, setConfig } = useConfigContext()
 
   const form = useForm({
     initialValues: {
-      firstName: config.firstName,
-      lastName: config.lastName,
-      fileHeader: config.fileHeader
+      ghUsername: config.ghUsername,
+      ghPassword: config.ghPassword,
+      ghRepo: config.ghRepo
     },
     validateInputOnChange: true,
     validate: {
-      firstName: (name) => (name.length > 25 ? 'Name must be 25 characters or less' : null),
-      lastName: (name) => (name.length > 25 ? 'Name must be 25 characters or less' : null)
+      ghUsername: (username) =>
+        username.length < 3
+          ? ''
+          : username.length > 25
+            ? 'Username must be 25 characters or less'
+            : null,
+      ghPassword: (password) =>
+        password.length < 3
+          ? ''
+          : password.length > 25
+            ? 'Password must be 25 characters or less'
+            : null,
+      ghRepo: (url) => (url.length < 3 ? '' : null)
     }
   })
 
@@ -40,91 +41,22 @@ export function Backup() {
           <div style={{ width: '75%', marginTop: '30px' }}>
             <Fieldset legend="GitHub Info">
               <TextInput
-                label="First Name"
-                placeholder="First Name"
-                {...form.getInputProps('firstName')}
+                label="Username"
+                placeholder="Username"
+                {...form.getInputProps('ghUsername')}
               />
-              <TextInput
-                label="Last Name"
-                placeholder="Last Name"
-                {...form.getInputProps('lastName')}
+              <PasswordInput
+                label="Password"
+                placeholder="Password"
+                {...form.getInputProps('ghPassword')}
                 mt="sm"
               />
-            </Fieldset>
-            <Fieldset mt="20px" legend="File Header">
-              <UnstyledButton w="100%" onClick={() => form.setFieldValue('fileHeader', 0)}>
-                <Box
-                  bg={form.values.fileHeader == 0 ? 'green.9' : 'gray.9'}
-                  w="100%"
-                  p="10px"
-                  style={{ borderRadius: 5 }}
-                >
-                  No Header
-                </Box>
-              </UnstyledButton>
-              <UnstyledButton w="100%" mt={8} onClick={() => form.setFieldValue('fileHeader', 1)}>
-                <Box
-                  bg={form.values.fileHeader == 1 ? 'green.9' : 'gray.9'}
-                  w="100%"
-                  p="10px"
-                  style={{ borderRadius: 5 }}
-                >
-                  <Box bg="black" w="100%" p="8px" style={{ borderRadius: 5 }}>
-                    <Text size="xl">[File Name]</Text>
-                    <Text>[Your Name]</Text>
-                    <Text>[Created Date]</Text>
-                    <Divider my="xs" />
-                  </Box>
-                </Box>
-              </UnstyledButton>
-              <UnstyledButton w="100%" mt={8} onClick={() => form.setFieldValue('fileHeader', 2)}>
-                <Box
-                  bg={form.values.fileHeader == 2 ? 'green.9' : 'gray.9'}
-                  w="100%"
-                  p="10px"
-                  style={{ borderRadius: 5 }}
-                >
-                  <Box bg="black" w="100%" p="8px" style={{ borderRadius: 5, textAlign: 'center' }}>
-                    <Text size="xl">[File Name]</Text>
-                    <Text>[Your Name]</Text>
-                    <Text>[Created Date]</Text>
-                    <Divider my="xs" />
-                  </Box>
-                </Box>
-              </UnstyledButton>
-              <UnstyledButton w="100%" mt={8} onClick={() => form.setFieldValue('fileHeader', 3)}>
-                <Box
-                  bg={form.values.fileHeader == 3 ? 'green.9' : 'gray.9'}
-                  w="100%"
-                  p="10px"
-                  style={{ borderRadius: 5 }}
-                >
-                  <Box bg="black" w="100%" p="8px" style={{ borderRadius: 5 }}>
-                    <Text size="xl">[File Name]</Text>
-                    <Text>[Created Date]</Text>
-                    <Divider my="xs" />
-                  </Box>
-                </Box>
-              </UnstyledButton>
-              <UnstyledButton w="100%" mt={8} onClick={() => form.setFieldValue('fileHeader', 4)}>
-                <Box
-                  bg={form.values.fileHeader == 4 ? 'green.9' : 'gray.9'}
-                  w="100%"
-                  p="10px"
-                  style={{ borderRadius: 5 }}
-                >
-                  <Box
-                    bg="black"
-                    w="100%"
-                    p="16px"
-                    style={{ borderRadius: 5, textAlign: 'center' }}
-                  >
-                    <Text size="xl">[File Name]</Text>
-                    <Text>[Created Date]</Text>
-                    <Divider my="xs" />
-                  </Box>
-                </Box>
-              </UnstyledButton>
+              <TextInput
+                label="GitHub Repo URL"
+                placeholder="GitHub Repo URL"
+                {...form.getInputProps('ghRepo')}
+                mt="sm"
+              />
             </Fieldset>
             <Button
               size="lg"
