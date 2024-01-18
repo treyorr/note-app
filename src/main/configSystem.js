@@ -1,4 +1,6 @@
 const { ipcMain } = require('electron')
+const path = require('path')
+const { execSync } = require('child_process')
 const Store = require('electron-store')
 
 const schema = {
@@ -13,14 +15,6 @@ const schema = {
   fileHeader: {
     type: 'number',
     default: 0
-  },
-  ghUsername: {
-    type: 'string',
-    default: ''
-  },
-  ghPassword: {
-    type: 'string',
-    default: ''
   },
   ghRepo: {
     type: 'string',
@@ -55,3 +49,35 @@ ipcMain.handle('save-config-data', async (event, ...args) => {
     return { success: false, error: error.message }
   }
 })
+
+ipcMain.handle('generate-ssh-key', async (event, ...args) => {
+  generateSSHKeyPair()
+    .then((publicKey) => {
+      store.set('pubKey', publicKey)
+      return { success: true, data: publicKey }
+    })
+    .catch((error) => {
+      console.error('Error:', error.message)
+    })
+})
+
+async function generateSSHKeyPair() {
+  //check for existing ssh key
+
+  const privateKeyPath = path.resolve(process.env.HOME, '.ssh', 'note-key')
+
+  try {
+    // Generate SSH key pair
+    execSync(`ssh-keygen -t rsa -b 4096 -f ${privateKeyPath} -N '' -C 'note-app'`)
+    console.log('SSH key pair generated successfully.')
+
+    const publicKeyPath = `${privateKeyPath}.pub`
+    const publicKey = execSync(`cat ${publicKeyPath}`, { encoding: 'utf-8' })
+
+    console.log('Public key:', publicKey)
+    return publicKey
+  } catch (error) {
+    console.error('Error generating SSH key pair:', error.message)
+    throw error
+  }
+}

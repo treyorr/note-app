@@ -43,7 +43,8 @@
     "emoji-mart": "^5.5.2",
     "emoji-picker-react": "^4.5.16",
     "mantine-contextmenu": "^7.1.12",
-    "rimraf": "^5.0.5"
+    "rimraf": "^5.0.5",
+    "ssh-keygen": "^0.5.0"
   },
   "devDependencies": {
     "@electron-toolkit/eslint-config": "^1.0.1",

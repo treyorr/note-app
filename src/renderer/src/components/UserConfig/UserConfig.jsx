@@ -11,6 +11,7 @@ import {
   Divider,
   ScrollArea
 } from '@mantine/core'
+import { IconDeviceFloppy } from '@tabler/icons-react'
 
 export function UserConfig() {
   const { config, setConfig } = useConfigContext()
@@ -133,6 +134,7 @@ export function UserConfig() {
               disabled={!form.isDirty() || !form.isValid()}
               fullWidth
               color="blue"
+              leftSection={<IconDeviceFloppy />}
             >
               Apply Configuration
             </Button>
