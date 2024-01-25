@@ -14,6 +14,9 @@ import {
 } from '@mantine/core'
 import { IconArrowLeft, IconArrowRight, IconDeviceFloppy } from '@tabler/icons-react'
 import { useState } from 'react'
+import CreateRepository from './CreateRepository'
+import GenerateSSH from './GenerateSSH'
+import ConnectGit from './ConnectGit'
 
 export function BackupConfig() {
   const [active, setActive] = useState(0)
@@ -36,23 +39,41 @@ export function BackupConfig() {
     form.setInitialValues(values)
   }
 
+  function isNextDisabled() {
+    if (active == 0) {
+      return config.ghRepo.length == 0
+    } else if (active == 1) {
+      return config.sshKey.length == 0
+    } else if (active == 2) {
+      return config.gitConnected == false
+    }
+  }
+  console.log(config)
   return (
     <ScrollArea h="100vh">
       <form onSubmit={form.onSubmit((values) => applyConfiguration(values))}>
         <Center>
-          <div style={{ width: '75%', marginTop: '30px' }}>
+          <div
+            style={{
+              width: '75%',
+              marginTop: '30px',
+              border: '1px solid gray',
+              borderRadius: '7px',
+              padding: '20px'
+            }}
+          >
             <Stepper active={active}>
-              <Stepper.Step label="First step" description="Generate SSH Key">
-                Step 1 content: Create an account
+              <Stepper.Step label="First step" description="Create Repository">
+                <CreateRepository form={form} config={config} />
               </Stepper.Step>
-              <Stepper.Step label="Second step" description="Create Repository">
-                Step 2 content: Verify email
+              <Stepper.Step label="Second step" description="Get SSH Key">
+                <GenerateSSH />
               </Stepper.Step>
               <Stepper.Step label="Final step" description="Connect">
-                Step 3 content: Get full access
+                <ConnectGit />
               </Stepper.Step>
               <Stepper.Completed>
-                Completed, click back button to get to previous step
+                Setup completed! You can back up your notes any time.
               </Stepper.Completed>
             </Stepper>
 
@@ -63,7 +84,11 @@ export function BackupConfig() {
                 </Button>
               )}
               {active < 3 && (
-                <Button rightSection={<IconArrowRight />} onClick={nextStep}>
+                <Button
+                  disabled={isNextDisabled()}
+                  rightSection={<IconArrowRight />}
+                  onClick={nextStep}
+                >
                   Next step
                 </Button>
               )}
