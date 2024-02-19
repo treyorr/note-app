@@ -9,6 +9,7 @@ const fs = require('fs')
 const os = require('os')
 
 const noteDir = getNoteDir()
+const git = simpleGit(noteDir)
 
 const schema = {
   firstName: {
@@ -95,10 +96,7 @@ ipcMain.handle('get-ssh-key', async (event, ...args) => {
 ipcMain.handle('connect-github', async (event, ...args) => {
   try {
     const repoDir = store.get('ghRepo')
-    const git = simpleGit(noteDir)
     await git.init()
-    await git.add('.')
-    await git.commit('Initial commit')
     const remotes = await git.getRemotes(true /* fetch */)
     const remoteExists = remotes.some((remote) => remote.name === 'origin')
     if (!remoteExists) {
@@ -110,6 +108,23 @@ ipcMain.handle('connect-github', async (event, ...args) => {
     return { success: true }
   } catch (error) {
     console.error(`Error connecting to GitHub: ${error.message}`)
+    return { success: false, error: error.message }
+  }
+})
+
+ipcMain.handle('backup-notes', async (event, ...args) => {
+  try {
+    const statusSummary = await git.status()
+    if (statusSummary.files.length > 0) {
+      await git.add('.')
+      await git.commit('Backup notes')
+      await git.push('origin', 'master')
+      return { success: true }
+    } else {
+      throw new Error('No changes to commit')
+    }
+  } catch (error) {
+    console.error(`Error backing up notes: ${error.message}`)
     return { success: false, error: error.message }
   }
 })

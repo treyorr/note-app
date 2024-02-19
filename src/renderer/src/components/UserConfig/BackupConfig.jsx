@@ -1,18 +1,7 @@
 import { useForm } from '@mantine/form'
 import { useConfigContext } from '../../context/ConfigContext'
-import {
-  Button,
-  Center,
-  Fieldset,
-  TextInput,
-  Text,
-  UnstyledButton,
-  Box,
-  Stepper,
-  Group,
-  ScrollArea
-} from '@mantine/core'
-import { IconArrowLeft, IconArrowRight, IconDeviceFloppy } from '@tabler/icons-react'
+import { Button, Center, Stepper, Group, ScrollArea } from '@mantine/core'
+import { IconArrowLeft, IconArrowRight } from '@tabler/icons-react'
 import { useState } from 'react'
 import CreateRepository from './CreateRepository'
 import GenerateSSH from './GenerateSSH'

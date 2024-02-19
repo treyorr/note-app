@@ -14,16 +14,6 @@ export default function ConnectGit() {
       if (response.success) {
         setConfig({ gitConnected: true })
         setLoading(false)
-        notifications.show({
-          id: 'success',
-          withCloseButton: true,
-          autoClose: 5000,
-          title: 'GitHub connected successfully',
-          message: `Your files are now backed up`,
-          color: 'green',
-          className: 'my-notification-class',
-          loading: false
-        })
       } else {
         throw response.error
       }
@@ -55,6 +45,7 @@ export default function ConnectGit() {
             size="lg"
             color="green"
             onClick={handleClick}
+            loading={loading}
             rightSection={<IconPlugConnected />}
           >
             Connect GitHub

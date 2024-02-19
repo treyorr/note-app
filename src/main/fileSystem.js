@@ -123,7 +123,7 @@ ipcMain.handle('get-dir-contents', async (event, ...args) => {
     const configPath = path.join(dirPath, 'config.json')
     const configData = await getConfigData(configPath)
     const files = dirents
-      .filter((dirent) => dirent.name !== 'config.json')
+      .filter((dirent) => dirent.name !== 'config.json' && !dirent.name.startsWith('.'))
       .map((dirent) => ({
         name: dirent.name,
         type: dirent.isDirectory() ? 'directory' : 'file',

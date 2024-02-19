@@ -1,7 +1,8 @@
 import { Tabs } from '@mantine/core'
 import { UserConfig } from './UserConfig'
 import { BackupConfig } from './BackupConfig'
-import { IconCloud, IconDeviceFloppy, IconUser } from '@tabler/icons-react'
+import { IconCloud, IconUser } from '@tabler/icons-react'
+import BackupButton from './BackupButton'
 
 export function Settings() {
   return (
@@ -13,6 +14,7 @@ export function Settings() {
         <Tabs.Tab style={{ borderRadius: 0 }} leftSection={<IconCloud />} value="backupConfig">
           Backup Config
         </Tabs.Tab>
+        <BackupButton />
       </Tabs.List>
 
       <Tabs.Panel value="userConfig">
