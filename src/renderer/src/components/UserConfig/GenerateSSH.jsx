@@ -5,15 +5,16 @@ import { useConfigContext } from '../../context/ConfigContext'
 export default function GenerateSSH() {
   const clipboard = useClipboard({ timeout: 500 })
   const { config, setConfig } = useConfigContext()
+
   const generateSSHKey = async () => {
     try {
       const response = await window.electron.ipcRenderer.invoke('get-ssh-key')
-      setConfig({ ...config, sshKey: response.data })
+      setConfig({ sshKey: response.data })
     } catch (error) {
       console.error('Error fetching collections:', error)
     }
   }
-  console.log(config)
+
   return (
     <Stack align="center">
       {config.sshKey == '' ? (

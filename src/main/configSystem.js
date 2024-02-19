@@ -1,9 +1,14 @@
+import simpleGit from 'simple-git'
+import { getNoteDir } from './fileSystem'
+
 const { ipcMain } = require('electron')
 const path = require('path')
 const { execSync } = require('child_process')
 const Store = require('electron-store')
 const fs = require('fs')
 const os = require('os')
+
+const noteDir = getNoteDir()
 
 const schema = {
   firstName: {
@@ -51,8 +56,10 @@ ipcMain.handle('get-config-data', async (event, ...args) => {
 ipcMain.handle('save-config-data', async (event, ...args) => {
   console.log(args[0])
   try {
-    store.store = args[0]
-    console.log(`Saved config data: ${JSON.stringify(args[0])}`)
+    for (const [key, value] of Object.entries(args[0])) {
+      store.set(key, value)
+    }
+    console.log(`Saved config data: ${JSON.stringify(store.store)}`)
     return { success: true }
   } catch (error) {
     console.error(`Error saving config data: ${error.message}`)
@@ -82,6 +89,28 @@ ipcMain.handle('get-ssh-key', async (event, ...args) => {
           return { success: false, error: error.message }
         })
     }
+  }
+})
+
+ipcMain.handle('connect-github', async (event, ...args) => {
+  try {
+    const repoDir = store.get('ghRepo')
+    const git = simpleGit(noteDir)
+    await git.init()
+    await git.add('.')
+    await git.commit('Initial commit')
+    const remotes = await git.getRemotes(true /* fetch */)
+    const remoteExists = remotes.some((remote) => remote.name === 'origin')
+    if (!remoteExists) {
+      await git.addRemote('origin', repoDir)
+      console.log('Remote repository added successfully')
+    } else {
+      console.log('Remote repository already exists')
+    }
+    return { success: true }
+  } catch (error) {
+    console.error(`Error connecting to GitHub: ${error.message}`)
+    return { success: false, error: error.message }
   }
 })
 

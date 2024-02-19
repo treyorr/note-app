@@ -73,7 +73,7 @@ export function BackupConfig() {
                 <ConnectGit />
               </Stepper.Step>
               <Stepper.Completed>
-                Setup completed! You can back up your notes any time.
+                <Center>Setup completed! You can back up your notes any time.</Center>
               </Stepper.Completed>
             </Stepper>
 

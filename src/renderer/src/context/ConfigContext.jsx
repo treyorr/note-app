@@ -8,7 +8,12 @@ export const ConfigProvider = ({ children }) => {
   const setConfig = async (config) => {
     const response = await window.electron.ipcRenderer.invoke('save-config-data', config)
     if (response.success) {
-      setConfiguration(config)
+      setConfiguration((prevConfig) => {
+        return {
+          ...prevConfig,
+          ...config
+        }
+      })
     }
   }
 
